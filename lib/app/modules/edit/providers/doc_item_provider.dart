@@ -43,7 +43,8 @@ class DocItemProvider extends GetConnect {
    }
   }
   Future<List<dynamic>?> getItems(Map data) async {
-    print('${apiUrl}get-item');
+    print('data');
+    print(data);
     final response = await post('${apiUrl}get-doc-items' , data);
     if(response.status.hasError){
       print('error');

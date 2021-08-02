@@ -63,69 +63,105 @@ class EditView extends GetView<EditController> {
   Widget insert(context, data) {
     return Container(
       padding: EdgeInsets.fromLTRB(20.0, 0, 20.0, 20.0),
-      child: Column(
-        children: [
-          TextFormField(
-            keyboardType: TextInputType.number,
-            focusNode: controller.itemFocus,
-            controller: controller.codeController,
-            textInputAction: TextInputAction.next,
-            onFieldSubmitted: (data) => {controller.itemChanged(context, data)},
-            decoration: const InputDecoration(labelText: 'ادخل كود '),
-            validator: controller.validator,
-          ),
-          if (controller.itemNotFound) Text('لا يوجد صنف بهئا الكود'),
-          data.length > 0 && controller.codeController.text != ''
-              ? Row(
-                  children: [
-                    Text(data[0]['ItemName'], textAlign: TextAlign.center),
-                    Text('..... المحتوي:'),
-                    Text(data[0]['MinorPerMajor'].toString(),
-                        textAlign: TextAlign.center),
-                  ],
-                )
-              : Text(""),
-          Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20),
+      child: SingleChildScrollView(
+              child: Column(
+          children: [
+            TextFormField(
+              keyboardType: TextInputType.number,
+              focusNode: controller.itemFocus,
+              controller: controller.codeController,
+              textInputAction: TextInputAction.next,
+              onFieldSubmitted: (data) => {controller.itemChanged(context, data)},
+              decoration: const InputDecoration(labelText: 'ادخل كود '),
+              validator: controller.validator,
+            ),
+            if (controller.itemNotFound) Text('لا يوجد صنف بهئا الكود'),
+            data.length > 0 && controller.codeController.text != ''
+                ? Row(
+                    children: [
+                      Text(data[0]['ItemName'], textAlign: TextAlign.center),
+                      Text('..... المحتوي:'),
+                      Text(data[0]['MinorPerMajor'].toString(),
+                          textAlign: TextAlign.center),
+                    ],
+                  )
+                : Text(""),
+            Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20),
+                    child: TextFormField(
+                      focusNode: controller.qtyWholeFocus,
+                      keyboardType: TextInputType.number,
+                      onFieldSubmitted: (data) =>
+                          {controller.qtyWholeChanged(context, data)},
+                      textInputAction: TextInputAction.next,
+                      controller: controller.wholeQtyController,
+                      decoration:
+                          const InputDecoration(labelText: 'الكمية الكلية'),
+                      validator: controller.validator,
+                    ),
+                  ),
+                ),
+                Expanded(
                   child: TextFormField(
-                    focusNode: controller.qtyWholeFocus,
+                    focusNode: controller.qtyFocus,
                     keyboardType: TextInputType.number,
                     onFieldSubmitted: (data) =>
-                        {controller.qtyWholeChanged(context, data)},
-                    textInputAction: TextInputAction.next,
-                    controller: controller.wholeQtyController,
+                        {controller.qtyChanged(context, data)},
+                    controller: controller.qtyController,
+                    textInputAction: TextInputAction.done,
                     decoration:
-                        const InputDecoration(labelText: 'الكمية الكلية'),
+                        const InputDecoration(labelText: 'الكمية الجزئية'),
                     validator: controller.validator,
                   ),
                 ),
-              ),
-              Expanded(
-                child: TextFormField(
-                  focusNode: controller.qtyFocus,
-                  keyboardType: TextInputType.number,
-                  onFieldSubmitted: (data) =>
-                      {controller.qtyChanged(context, data)},
-                  controller: controller.qtyController,
-                  textInputAction: TextInputAction.done,
-                  decoration:
-                      const InputDecoration(labelText: 'الكمية الجزئية'),
-                  validator: controller.validator,
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 20.0),
-            child: RaisedButton(
-              child: Text('حفظ'),
-              onPressed: () => controller.submit(context),
+              ],
             ),
-          )
-        ],
+            // controller.withExp ? Row(
+            //   children: [
+            //     Expanded(
+            //       child: Padding(
+            //         padding: const EdgeInsets.only(left: 20),
+            //         child: TextFormField(
+            //           focusNode: controller.monthFocus,
+            //           keyboardType: TextInputType.number,
+            //           onFieldSubmitted: (data) =>
+            //               {controller.monthChanged(context, data)},
+            //           textInputAction: TextInputAction.next,
+            //           controller: controller.monthController,
+            //           decoration:
+            //               const InputDecoration(labelText: 'شهر انتهاء الصلاحية'),
+            //           validator: controller.validator,
+            //         ),
+            //       ),
+            //     ),
+            //     Expanded(
+            //       child: TextFormField(
+            //         focusNode: controller.yearFocus,
+            //         keyboardType: TextInputType.number,
+            //         onFieldSubmitted: (data) =>
+            //             {controller.yearChanged(context, data)},
+            //         controller: controller.yearController,
+            //         textInputAction: TextInputAction.done,
+            //         decoration:
+            //             const InputDecoration(labelText: 'سنة  انتهاء الصلاحية'),
+            //         validator: controller.validator,
+            //       ),
+            //     ),
+            //   ],
+            // ): SizedBox(height: 0,),
+            
+            Padding(
+              padding: const EdgeInsets.only(top: 20.0),
+              child: RaisedButton(
+                child: Text('حفظ'),
+                onPressed: () => controller.submit(context),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

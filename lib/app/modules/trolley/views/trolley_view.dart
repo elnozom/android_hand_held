@@ -9,7 +9,7 @@ class TrolleyView extends GetView<TrolleyController> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('TrolleyView'),
+          title: Text('مراجعة اسعار'),
           centerTitle: true,
         ),
         body: controller.obx((state) => Container(
