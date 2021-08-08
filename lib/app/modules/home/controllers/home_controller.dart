@@ -1,5 +1,6 @@
 import 'package:elnozom/app/data/models/config_model.dart';
 import 'package:elnozom/app/modules/home/tab_model.dart';
+import 'package:elnozom/app/modules/list/controllers/list_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -71,6 +72,22 @@ class HomeController extends GetxController {
       type: -1,
     ),
     TabModel(
+      icon: Icons.inventory_2_outlined,
+      text: 'تحضير',
+      transSerial: 100,
+      link: 'preparation',
+      accountType: 1,
+      type: -1,
+    ),
+    TabModel(
+      icon: Icons.inventory_2_outlined,
+      text: 'مستندات تحضير',
+      transSerial: 101,
+      link: 'notPrepared',
+      accountType: 1,
+      type: -1,
+    ),
+    TabModel(
       icon: Icons.settings_outlined,
       text: "الاعدادات",
       transSerial: 0,
@@ -82,12 +99,17 @@ class HomeController extends GetxController {
 
   void goTo(index) {
     var tab = tabs[index];
+      Config arguments = new Config(
+          trSerial: tab.transSerial, type: tab.type, accType: tab.accountType);
     if (tab.transSerial == -1) {
       Get.toNamed("/trolley");
-    } else if(tab.transSerial == 0) {
+    } else if (tab.transSerial == 100) {
+      Get.toNamed("/config", arguments: arguments);
+    } else if (tab.transSerial == 101) {
+      Get.toNamed("/unprepared");
+    } else if (tab.transSerial == 0) {
       Get.toNamed("/settings");
     } else {
-      Config arguments = new Config(trSerial :tab.transSerial , type: tab.type , accType:tab.accountType);
       Get.toNamed("/list", arguments: arguments);
     }
   }

@@ -23,5 +23,16 @@ class AccountProvider extends GetConnect {
      return response.body;
    }
   }
+  Future<List<dynamic>?> getEmp(Map data) async {
+    final response = await get('${apiUrl}employee?EmpCode=${data["EmpCode"]}');
+    print('response.status.hasError');
+    print(response.status.hasError);
+    if(response.status.hasError){
+     return Future.error(response.statusText.toString());
+   } else {
+     return response.body;
+   }
+  }
+  
   
 }

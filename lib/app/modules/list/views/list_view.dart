@@ -7,6 +7,7 @@ import '../controllers/list_controller.dart';
 class ListView extends GetView<ListController> {
   @override
   Widget build(BuildContext context) {
+  controller.getItems();
     return new WillPopScope(
         onWillPop: () async {
           await Get.offAllNamed('/home', arguments: Get.arguments);
@@ -32,7 +33,12 @@ class ListView extends GetView<ListController> {
               rows: <DataRow>[
                 for (var i = 0; i < state.length; i++) controller.generateRows(state , i),
               ],
-            ) : Text('لا يوجد مستندات مفتوحة'),
+            ) : Column(
+              children: [
+                Text('لا يوجد مستندات مفتوحة'),
+                RaisedButton(onPressed:  () => {controller.createDoc()},child: Text("اضافة مستند جديد"),)
+              ],
+            ),
           ),
         )));
   }

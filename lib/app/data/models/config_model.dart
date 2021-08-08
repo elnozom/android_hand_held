@@ -4,9 +4,15 @@ class Config {
   int? accType;
   int? docNo;
   int? accSerial;
+  int? toStore;
 
   Config(
-      {this.trSerial, this.type, this.accType, this.docNo, this.accSerial});
+      {this.trSerial,
+      this.type,
+      this.accType,
+      this.docNo,
+      this.accSerial,
+      this.toStore});
 
   Config.fromJson(Map<String, dynamic> json) {
     trSerial = json['trSerial'];
@@ -14,6 +20,7 @@ class Config {
     accType = json['accType'];
     docNo = json['docNo'];
     accSerial = json['accSerial'];
+    toStore = json['toStore'];
   }
 
   Map<String, dynamic> toJson() {
@@ -23,6 +30,7 @@ class Config {
     data['accType'] = accType;
     data['docNo'] = docNo;
     data['accSerial'] = accSerial;
+    data['toStore'] = toStore;
     return data;
   }
 }

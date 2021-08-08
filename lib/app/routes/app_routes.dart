@@ -10,6 +10,8 @@ abstract class Routes {
   static const LIST = _Paths.LIST;
   static const TROLLEY = _Paths.TROLLEY;
   static const SETTINGS = _Paths.SETTINGS;
+  static const PREPARE = _Paths.PREPARE;
+  static const UNPREPARED = _Paths.UNPREPARED;
 }
 
 abstract class _Paths {
@@ -19,4 +21,6 @@ abstract class _Paths {
   static const LIST = '/list';
   static const TROLLEY = '/trolley';
   static const SETTINGS = '/settings';
+  static const PREPARE = '/prepare';
+  static const UNPREPARED = '/unprepared';
 }

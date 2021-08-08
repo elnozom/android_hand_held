@@ -17,12 +17,14 @@ class EditController extends GetxController with StateMixin<List<dynamic>> {
   final FocusNode qtyWholeFocus = FocusNode();
   final FocusNode monthFocus = FocusNode();
   final FocusNode yearFocus = FocusNode();
-  int? docNo = null;
-  int? trSerial = null;
   DateTime? expDate = null;
   bool itemNotFound = false;
+  bool expExisted = false;
   bool withExp = false;
+  bool qtyHidden = false;
   bool yearErr = false;
+  bool qntErr = false;
+
   bool monthErr = false;
   var minorPerMajor = 1;
   List<dynamic>? item = [];
@@ -43,6 +45,8 @@ class EditController extends GetxController with StateMixin<List<dynamic>> {
     codeController.dispose();
     wholeQtyController.dispose();
     qtyController.dispose();
+    monthController.dispose();
+    yearController.dispose();
     super.onClose();
   }
 
@@ -64,6 +68,20 @@ class EditController extends GetxController with StateMixin<List<dynamic>> {
         itemNotFound = false;
         _fieldFocusChange(context, itemFocus, qtyWholeFocus);
         item = resp;
+        expExisted = false;
+        if (item![0]['WithExp']) {
+          if (item![0]['Expirey'] != '0') {
+            monthController.text = item![0]['Expirey'].substring(0, 2);
+            yearController.text = item![0]['Expirey'].substring(2);
+            expExisted = true;
+          }
+        }
+        if (item![0]['MinorPerMajor'] == 1) {
+          qtyHidden = true;
+          qtyController.text = "0";
+        } else {
+          qtyHidden = false;
+        }
         withExp = item![0]['WithExp'];
       }
       change(null, status: RxStatus.success());
@@ -75,20 +93,7 @@ class EditController extends GetxController with StateMixin<List<dynamic>> {
 
   void qtyChanged(context, data) async {
     if (withExp) {
-      docNo = Get.arguments !=null ? Get.arguments.docNo : docNo;
-      trSerial = Get.arguments !=null ? Get.arguments.trSerial : trSerial;
-      final initialDate = DateTime.now();
-      expDate = await showDatePicker(
-          context: context,
-          initialDate: initialDate,
-          firstDate: initialDate,
-          initialEntryMode: DatePickerEntryMode.input,
-          cancelText: "غلق",
-          confirmText: "حفظ",
-          initialDatePickerMode: DatePickerMode.year,
-          // locale: Locale.fromSubtags(''),
-          helpText: "من فضلك ادخل تاريخ الصلاحية",
-          lastDate: DateTime(DateTime.now().year + 5));
+      _fieldFocusChange(context, qtyFocus, monthFocus);
       if (expDate != null) {
         submit(context);
       }
@@ -99,7 +104,16 @@ class EditController extends GetxController with StateMixin<List<dynamic>> {
   }
 
   void qtyWholeChanged(context, data) {
-    _fieldFocusChange(context, qtyWholeFocus, qtyFocus);
+    if (!qtyHidden) {
+      _fieldFocusChange(context, qtyWholeFocus, qtyFocus);
+    }
+    if (withExp && qtyHidden) {
+      _fieldFocusChange(context, qtyWholeFocus, monthFocus);
+    }
+
+    if (!withExp && qtyHidden) {
+      submit(context);
+    }
   }
 
   String? validator(String? value) {
@@ -115,56 +129,72 @@ class EditController extends GetxController with StateMixin<List<dynamic>> {
     // return error message if date is in the past
 
     // create date variable
-    if (withExp && expDate == null) {
-      qtyChanged(context,qtyController.text);
+
+    print("Asdasd");
+    print(Get.arguments.accSerial);
+    int qnt;
+    qtyController.text == null ? 0 : qtyController.text;
+    if (item![0]['ByWeight']) {
+      qnt = int.parse(wholeQtyController.text);
     } else {
-      int qnt;
-      qtyController.text == null ? 0 : qtyController.text;
-      if (item![0]['ByWeight']) {
-        qnt = int.parse(wholeQtyController.text);
-      } else {
-        int minor = item![0]['MinorPerMajor'];
-        qnt = int.parse(wholeQtyController.text) * minor +
-            int.parse(qtyController.text);
-      }
-      print("Asdasd");
-      // print(Get.arguments);
+      int minor = item![0]['MinorPerMajor'];
+      qnt = int.parse(wholeQtyController.text) * minor +
+          int.parse(qtyController.text);
+    }
+
+    if (qnt == 0) {
+      print(qnt);
+      qntErr = true;
+    } else {
+      qntErr = false;
 
       final Map req = {
-        "DNo": Get.arguments != null ? Get.arguments.docNo :  docNo ,
-        "TrS": Get.arguments != null ? Get.arguments.trSerial : trSerial ,
-        "AccS": 2,
+        "DNo": Get.arguments.docNo,
+        "TrS": Get.arguments.trSerial,
+        "AccS": Get.arguments.accSerial,
         "ItmS": item![0]['Serial'],
         "Qnt": qnt,
-        "StCode": 1,
-        "StCode2": 2,
-        "InvNo": 1353,
+        "StCode": localeStorage.read('store') != null
+            ? int.parse(localeStorage.read('store'))
+            : 1,
+        "StCode2": Get.arguments.toStore != null ? Get.arguments.toStore : 0,
+        "InvNo": 0,
         "ItmBarCode": codeController.text,
-        "DevNo": 1,
-        "ExpDate":expDate !=null ? '${expDate!.month}/${expDate!.day}/${expDate!.year}' : null
+        "DevNo": localeStorage.read('device') != null
+            ? int.parse(localeStorage.read('device'))
+            : 1,
+        "ExpDate": monthController.text != ""
+            ? '${monthController.text}/1/${yearController.text}'
+            : null
       };
-      print("Asdasd");
 
-      print(req);
       var resp = await DocItemProvider().insertItem(req);
       item = [];
       qtyController.clear();
       wholeQtyController.clear();
       codeController.clear();
+      monthController.clear();
+      yearController.clear();
       expDate = null;
+      withExp = false;
       fetchItems();
       _fieldFocusChange(context, qtyFocus, itemFocus);
     }
+    // print(Get.arguments);
 
 //
   }
 
   void fetchItems() async {
     final Map req2 = {
-      "DevNo": 1,
-      "TrSerial": Get.arguments != null ? Get.arguments.trSerial :  trSerial  ,
-      "StoreCode": 1,
-      "DocNo": Get.arguments != null ? Get.arguments.docNo :docNo
+      "DevNo": localeStorage.read('device') != null
+          ? int.parse(localeStorage.read('device'))
+          : 1,
+      "TrSerial": Get.arguments.trSerial,
+      "StoreCode": localeStorage.read('store') != null
+          ? int.parse(localeStorage.read('store'))
+          : 1,
+      "DocNo": Get.arguments.docNo
     };
     var resp2 = await DocItemProvider().getItems(req2);
     change(resp2, status: RxStatus.success());
@@ -172,12 +202,14 @@ class EditController extends GetxController with StateMixin<List<dynamic>> {
 
   void closeDoc() async {
     final Map req2 = {
-      "DevNo": 1,
+      "DevNo": localeStorage.read('device') != null
+          ? int.parse(localeStorage.read('device'))
+          : 1,
       "trans": Get.arguments.trSerial,
       "DocNo": Get.arguments.docNo
     };
     var resp2 = await DocItemProvider().closeDoc(req2);
-    Get.toNamed('/home', arguments: Get.arguments);
+    Get.toNamed('/home');
   }
 
   _fieldFocusChange(
@@ -187,15 +219,11 @@ class EditController extends GetxController with StateMixin<List<dynamic>> {
   }
 
   List<String> columns = [
-    "الاسم",
-    "كلي",
-    "جزئي",
+    "المنتج",
     "اجرائات",
   ];
   List<String> columnsKeys = [
     "ItemName",
-    "WholeQnt",
-    "Qnt",
     "delete",
   ];
   List<DataColumn> generateColumns() {
@@ -217,28 +245,28 @@ class EditController extends GetxController with StateMixin<List<dynamic>> {
     List<DataCell> wid = [];
     for (var i = 0; i < columnsKeys.length; i++) {
       if (columnsKeys[i] == 'delete') {
-        wid.add(DataCell(TextButton(
+        wid.add(DataCell(RaisedButton(
             onPressed: () async {
               var req = {"Serial": data[index]['Serial']};
               await DocItemProvider().removeItem(req);
               fetchItems();
             },
-            child: Text('delete'))));
-      } else if (columnsKeys[i] == 'WholeQnt') {
-        if (data[index]['ByWeight'] == false) {
-          wid.add(DataCell(Text(data[index]['Qnt'].toString())));
+            child: Text('حذف'))));
+      } else if (columnsKeys[i] == 'ItemName') {
+        var wholQnt;
+        var qnt;
+        if (data[index]['ByWeight'] == true) {
+          wholQnt = data[index]['Qnt'].toString();
+          qnt = 0;
         } else {
-          wid.add(DataCell(Text(
-              (data[index]['Qnt'] / data[index]['MinorPerMajor']).toString())));
+          wholQnt = (data[index]['Qnt'] / data[index]['MinorPerMajor'])
+              .floor()
+              .toString();
+          qnt = (data[index]['Qnt'].remainder(data[index]['MinorPerMajor']))
+              .toString();
         }
-      } else if (columnsKeys[i] == 'Qnt') {
-        if (data[index]['ByWeight'] == false) {
-          wid.add(DataCell(Text('0')));
-        } else {
-          wid.add(DataCell(Text(
-              (data[index]['Qnt'].remainder(data[index]['MinorPerMajor']))
-                  .toString())));
-        }
+        wid.add(DataCell(Text(
+            '${data[index][columnsKeys[i]].toString()} \n  الكمية الكلية : ${wholQnt} \n الكمية الجزئية : ${qnt} ')));
       } else {
         wid.add(DataCell(Text(data[index][columnsKeys[i]].toString())));
       }

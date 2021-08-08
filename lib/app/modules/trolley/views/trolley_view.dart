@@ -12,108 +12,110 @@ class TrolleyView extends GetView<TrolleyController> {
           title: Text('مراجعة اسعار'),
           centerTitle: true,
         ),
-        body: controller.obx((state) => Container(
-              padding: EdgeInsets.fromLTRB(20.0, 0, 20.0, 20.0),
-              child: Column(
-                children: [
-                  TextFormField(
-                    keyboardType: TextInputType.number,
-                    focusNode: controller.itemFocus,
-                    controller: controller.codeController,
-                    textInputAction: TextInputAction.next,
-                    onFieldSubmitted: (data) =>
-                        {controller.itemChanged(context, data)},
-                    decoration: const InputDecoration(labelText: 'ادخل كود '),
+        body: controller.obx((state) => SingleChildScrollView(
+                  child: Container(
+                padding: EdgeInsets.fromLTRB(20.0, 0, 20.0, 20.0),
+                child: Column(
+                  children: [
+                    TextFormField(
+                      keyboardType: TextInputType.number,
+                      focusNode: controller.itemFocus,
+                      controller: controller.codeController,
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (data) =>
+                          {controller.itemChanged(context, data)},
+                      decoration: const InputDecoration(labelText: 'ادخل كود '),
+                    ),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    if (controller.itemNotFound) Text('لا يوجد صنف بهئا الكود'),
+                    state != null && state.length > 0
+                        ? Container(
+                           padding: EdgeInsets.all(10.0),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.blue,
+                    ),
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  if (controller.itemNotFound) Text('لا يوجد صنف بهئا الكود'),
-                  state != null && state.length > 0
-                      ? Container(
-                         padding: EdgeInsets.all(10.0),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.blue,
-                  ),
-                  borderRadius: BorderRadius.circular(10.0),
+                          child: Column(children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Flexible(
+                                      child: Text('الاسم',
+                                          textAlign: TextAlign.center)),
+                                  Flexible(
+                                    child: Text(
+                                      state[0]['ItemName'].toString(),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Flexible(
+                                      child: Text('المحتوي',
+                                          textAlign: TextAlign.center)),
+                                  Flexible(
+                                    child: Text(
+                                      state[0]['MinorPerMajor'].toString(),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Flexible(
+                                      child: Text(' السعر الجزئي',
+                                          textAlign: TextAlign.right)),
+                                  Flexible(
+                                    child: Text(
+                                      '${state[0]['POSPP'].toString()} EGP',
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Flexible(
+                                      child: Text('السعر الكلي',
+                                          textAlign: TextAlign.center)),
+                                  Flexible(
+                                    child: Text(
+                                      '${state[0]['POSTP'].toString()} EGP',
+                                      
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Flexible(
+                                      child: Text('بالوزن',
+                                          textAlign: TextAlign.center)),
+                                  Flexible(
+                                    child: state[0]['ByWeight']
+                                        ? Text('نعم', textAlign: TextAlign.center)
+                                        : Text('لا', textAlign: TextAlign.center),
+                                  ),
+                                ],
+                              ),
+                            ]),
+                        )
+                        : Text(""),
+                  ],
                 ),
-                        child: Column(children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Flexible(
-                                    child: Text('الاسم',
-                                        textAlign: TextAlign.center)),
-                                Flexible(
-                                  child: Text(
-                                    state[0]['ItemName'].toString(),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Flexible(
-                                    child: Text('المحتوي',
-                                        textAlign: TextAlign.center)),
-                                Flexible(
-                                  child: Text(
-                                    state[0]['MinorPerMajor'].toString(),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Flexible(
-                                    child: Text(' السعر الجزئي',
-                                        textAlign: TextAlign.right)),
-                                Flexible(
-                                  child: Text(
-                                    '${state[0]['POSPP'].toString()} EGP',
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Flexible(
-                                    child: Text('السعر الكلي',
-                                        textAlign: TextAlign.center)),
-                                Flexible(
-                                  child: Text(
-                                    '${state[0]['POSTP'].toString()} EGP',
-                                    
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Flexible(
-                                    child: Text('بالوزن',
-                                        textAlign: TextAlign.center)),
-                                Flexible(
-                                  child: state[0]['ByWeight']
-                                      ? Text('نعم', textAlign: TextAlign.center)
-                                      : Text('لا', textAlign: TextAlign.center),
-                                ),
-                              ],
-                            ),
-                          ]),
-                      )
-                      : Text(""),
-                ],
               ),
-            )));
+        )));
   }
 }

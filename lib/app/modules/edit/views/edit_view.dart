@@ -14,7 +14,7 @@ class EditView extends GetView<EditController> {
   Widget build(BuildContext context) {
     return new WillPopScope(
         onWillPop: () async {
-          await Get.offAllNamed('/home', arguments: Get.arguments);
+          await Get.offAllNamed('/home');
           return true;
         },
         child: Scaffold(
@@ -49,6 +49,7 @@ class EditView extends GetView<EditController> {
               children: [
                 DataTable(
                   columns: controller.generateColumns(),
+                  dataRowHeight: 110,
                   rows: <DataRow>[
                     for (var i = 0; i < state.length; i++)
                       controller.generateRows(state, i),
@@ -104,7 +105,7 @@ class EditView extends GetView<EditController> {
                     ),
                   ),
                 ),
-                Expanded(
+                if (!controller.qtyHidden) Expanded(
                   child: TextFormField(
                     focusNode: controller.qtyFocus,
                     keyboardType: TextInputType.number,
@@ -119,39 +120,40 @@ class EditView extends GetView<EditController> {
                 ),
               ],
             ),
-            // controller.withExp ? Row(
-            //   children: [
-            //     Expanded(
-            //       child: Padding(
-            //         padding: const EdgeInsets.only(left: 20),
-            //         child: TextFormField(
-            //           focusNode: controller.monthFocus,
-            //           keyboardType: TextInputType.number,
-            //           onFieldSubmitted: (data) =>
-            //               {controller.monthChanged(context, data)},
-            //           textInputAction: TextInputAction.next,
-            //           controller: controller.monthController,
-            //           decoration:
-            //               const InputDecoration(labelText: 'شهر انتهاء الصلاحية'),
-            //           validator: controller.validator,
-            //         ),
-            //       ),
-            //     ),
-            //     Expanded(
-            //       child: TextFormField(
-            //         focusNode: controller.yearFocus,
-            //         keyboardType: TextInputType.number,
-            //         onFieldSubmitted: (data) =>
-            //             {controller.yearChanged(context, data)},
-            //         controller: controller.yearController,
-            //         textInputAction: TextInputAction.done,
-            //         decoration:
-            //             const InputDecoration(labelText: 'سنة  انتهاء الصلاحية'),
-            //         validator: controller.validator,
-            //       ),
-            //     ),
-            //   ],
-            // ): SizedBox(height: 0,),
+            if(controller.qntErr) Text("من فضلك ادخل كمية"),
+            controller.withExp && !controller.expExisted? Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20),
+                    child: TextFormField(
+                      focusNode: controller.monthFocus,
+                      keyboardType: TextInputType.number,
+                      onFieldSubmitted: (data) =>
+                          {controller.monthChanged(context, data)},
+                      textInputAction: TextInputAction.next,
+                      controller: controller.monthController,
+                      decoration:
+                          const InputDecoration(labelText: 'شهر انتهاء الصلاحية'),
+                      validator: controller.validator,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: TextFormField(
+                    focusNode: controller.yearFocus,
+                    keyboardType: TextInputType.number,
+                    onFieldSubmitted: (data) =>
+                        {controller.yearChanged(context, data)},
+                    controller: controller.yearController,
+                    textInputAction: TextInputAction.done,
+                    decoration:
+                        const InputDecoration(labelText: 'سنة  انتهاء الصلاحية'),
+                    validator: controller.validator,
+                  ),
+                ),
+              ],
+            ): SizedBox(height: 0,),
             
             Padding(
               padding: const EdgeInsets.only(top: 20.0),
