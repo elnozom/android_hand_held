@@ -12,6 +12,7 @@ abstract class Routes {
   static const SETTINGS = _Paths.SETTINGS;
   static const PREPARE = _Paths.PREPARE;
   static const UNPREPARED = _Paths.UNPREPARED;
+  static const ORDER = _Paths.ORDER;
 }
 
 abstract class _Paths {
@@ -23,4 +24,5 @@ abstract class _Paths {
   static const SETTINGS = '/settings';
   static const PREPARE = '/prepare';
   static const UNPREPARED = '/unprepared';
+  static const ORDER = '/order';
 }

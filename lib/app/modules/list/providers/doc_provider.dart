@@ -53,6 +53,8 @@ class DocProvider extends GetConnect {
     }
   }
 
+  
+
   Future<List<dynamic>> getInv(Map data) async {
     final response = await get('${apiUrl}invoice?BCode=${data["BCode"]}');
     if (response.status.hasError) {

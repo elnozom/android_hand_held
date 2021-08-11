@@ -8,6 +8,8 @@ import 'package:elnozom/app/modules/home/bindings/home_binding.dart';
 import 'package:elnozom/app/modules/home/views/home_view.dart';
 import 'package:elnozom/app/modules/list/bindings/list_binding.dart';
 import 'package:elnozom/app/modules/list/views/list_view.dart';
+import 'package:elnozom/app/modules/order/bindings/order_binding.dart';
+import 'package:elnozom/app/modules/order/views/order_view.dart';
 import 'package:elnozom/app/modules/prepare/bindings/prepare_binding.dart';
 import 'package:elnozom/app/modules/prepare/views/prepare_view.dart';
 import 'package:elnozom/app/modules/settings/bindings/settings_binding.dart';
@@ -64,6 +66,11 @@ class AppPages {
       name: _Paths.UNPREPARED,
       page: () => UnpreparedView(),
       binding: UnpreparedBinding(),
+    ),
+    GetPage(
+      name: _Paths.ORDER,
+      page: () => OrderView(),
+      binding: OrderBinding(),
     ),
   ];
 }

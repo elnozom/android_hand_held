@@ -36,6 +36,24 @@ class DocItemProvider extends GetConnect {
      return true;
    }
   }
+  Future<bool> insertOrderItem(Map data) async {
+    final response = await post('${apiUrl}orders/item' , data);
+    if(response.status.hasError){
+     return Future.error(response.statusText.toString());
+   } else {
+     return true;
+   }
+  }
+
+   Future<int> insertOrder(Map data) async {
+    final response = await post('${apiUrl}orders' , data);
+    if(response.status.hasError){
+     return Future.error(response.statusText.toString());
+   } else {
+     return response.body;
+   }
+  }
+  
   Future<List<dynamic>?> getItems(Map data) async {
     final response = await post('${apiUrl}get-doc-items' , data);
     if(response.status.hasError){

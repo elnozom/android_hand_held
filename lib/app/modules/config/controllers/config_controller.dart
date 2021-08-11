@@ -6,8 +6,10 @@ import 'package:elnozom/app/modules/settings/providers/store_provider.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:elnozom/app/modules/settings/store_model.dart';
+import 'package:get_storage/get_storage.dart';
 
 class ConfigController extends GetxController with StateMixin<List<dynamic>> {
+  final localeStorage = GetStorage();
   //TODO: Implement ConfigController
   final formKey = GlobalKey<FormState>();
   final codeController = TextEditingController();
@@ -21,6 +23,7 @@ class ConfigController extends GetxController with StateMixin<List<dynamic>> {
   bool notFound = false;
   var invoice = null;
   bool serialErr = false;
+
   // Config conf = args;
   var args = Get.arguments;
   bool isTransaction = Get.arguments.trSerial == 27;
@@ -91,11 +94,7 @@ class ConfigController extends GetxController with StateMixin<List<dynamic>> {
         change(null, status: RxStatus.error(err.toString()));
       });
     }
-    var req = {
-      "Code": int.parse(data),
-      "Name": "",
-      "Type": args.accType
-    };
+    var req = {"Code": int.parse(data), "Name": "", "Type": args.accType};
     AccountProvider().getAccount(req).then((resp) {
       if (resp != null && resp.isNotEmpty) {
         notFound = false;
@@ -143,18 +142,30 @@ class ConfigController extends GetxController with StateMixin<List<dynamic>> {
   void nameSubmitted(context, data) {
     serial = int.parse(data.split("....")[1]);
     codeController.text = serial.toString();
-    create();
+    // create();
   }
 
   void create() async {
     if (args.trSerial == 100) {
       if (invoice != null) {
-          var arguments = {'empCode' :  int.parse(codeController.text), 'hSerial' : invoice[0]['BonSer'] , 'invoice': invoice};
+        var arguments = {
+          'empCode': int.parse(codeController.text),
+          'hSerial': invoice[0]['BonSer'],
+          'invoice': invoice
+        };
         Get.toNamed('/prepare', arguments: arguments);
       } else {
         var req = {
           "BCode": invCodeController.text,
         };
+      }
+    } else if (args.trSerial == 102) {
+      if (serial == null) {
+        serialErr = true;
+      } else {
+        args.accSerial = serial;
+        // print(args);
+        Get.toNamed('/order', arguments: args);
       }
     } else {
       //check if its not a transaction and serial not passed to pass an error
@@ -162,8 +173,7 @@ class ConfigController extends GetxController with StateMixin<List<dynamic>> {
         serialErr = true;
       } else {
         args.accSerial = serial;
-        args.toStore =
-            selectedOption != null ? int.parse(selectedOption) : 0;
+        args.toStore = selectedOption != null ? int.parse(selectedOption) : 0;
         serialErr = false;
         Get.toNamed('/edit', arguments: args);
       }

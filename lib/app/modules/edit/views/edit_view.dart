@@ -154,6 +154,7 @@ class EditView extends GetView<EditController> {
                 ),
               ],
             ): SizedBox(height: 0,),
+            if(controller.dateErr) Text("من فضلك ادخل تاريخ صلاحية صحيح"),
             
             Padding(
               padding: const EdgeInsets.only(top: 20.0),

@@ -87,6 +87,14 @@ class HomeController extends GetxController {
       accountType: 1,
       type: -1,
     ),
+     TabModel(
+      icon: Icons.inventory_2_outlined,
+      text: 'امر بيع',
+      transSerial: 102,
+      link: 'salesOrder',
+      accountType: 1,
+      type: 1,
+    ),
     TabModel(
       icon: Icons.settings_outlined,
       text: "الاعدادات",

@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_storage/get_storage.dart';
-
+import 'package:date_format/date_format.dart';
 class EditController extends GetxController with StateMixin<List<dynamic>> {
   final localeStorage = GetStorage();
   final formKey = GlobalKey<FormState>();
@@ -20,6 +20,7 @@ class EditController extends GetxController with StateMixin<List<dynamic>> {
   DateTime? expDate = null;
   bool itemNotFound = false;
   bool expExisted = false;
+  bool dateErr = false;
   bool withExp = false;
   bool qtyHidden = false;
   bool yearErr = false;
@@ -51,10 +52,31 @@ class EditController extends GetxController with StateMixin<List<dynamic>> {
   }
 
   void monthChanged(context, data) {
+    if(data.length > 2){
+      dateErr = true;
+    }
+    int intD = int.parse(data);
+    if(intD > 12 || intD <=0){
+      dateErr = true;
+    }
     _fieldFocusChange(context, monthFocus, yearFocus);
   }
 
   void yearChanged(context, data) {
+     if(!(data.length == 2 || data.length == 4)){
+      dateErr = true;
+    }
+    int intD = int.parse(data);
+    if(data.length == 2){
+      if(intD > 21 || intD <=30){
+        dateErr = true;
+      }
+    } else if(data.length == 4){
+      if(intD > 2021 || intD <=2030){
+        dateErr = true;
+      }
+    }
+    _fieldFocusChange(context, monthFocus, yearFocus);
     submit(context);
   }
 
@@ -122,6 +144,15 @@ class EditController extends GetxController with StateMixin<List<dynamic>> {
     }
     return null;
   }
+DateTime? getDate(String str) {
+  try {
+    var date  = DateTime.parse(str);
+    return date;
+  } catch (e) {
+    return null;
+  }
+}
+
 
   void submit(context) async {
     //validate the date is bigger than now
@@ -129,9 +160,7 @@ class EditController extends GetxController with StateMixin<List<dynamic>> {
     // return error message if date is in the past
 
     // create date variable
-
-    print("Asdasd");
-    print(Get.arguments.accSerial);
+    
     int qnt;
     qtyController.text == null ? 0 : qtyController.text;
     if (item![0]['ByWeight']) {
@@ -143,44 +172,46 @@ class EditController extends GetxController with StateMixin<List<dynamic>> {
     }
 
     if (qnt == 0) {
-      print(qnt);
       qntErr = true;
     } else {
       qntErr = false;
+      var expD = monthController.text != "" ? '${monthController.text}/1/${yearController.text}' : null;
+      yearChanged(context , yearController.text);
+      monthChanged(context , monthController.text);
+      if(!dateErr){
 
-      final Map req = {
-        "DNo": Get.arguments.docNo,
-        "TrS": Get.arguments.trSerial,
-        "AccS": Get.arguments.accSerial,
-        "ItmS": item![0]['Serial'],
-        "Qnt": qnt,
-        "StCode": localeStorage.read('store') != null
-            ? int.parse(localeStorage.read('store'))
-            : 1,
-        "StCode2": Get.arguments.toStore != null ? Get.arguments.toStore : 0,
-        "InvNo": 0,
-        "ItmBarCode": codeController.text,
-        "DevNo": localeStorage.read('device') != null
-            ? int.parse(localeStorage.read('device'))
-            : 1,
-        "ExpDate": monthController.text != ""
-            ? '${monthController.text}/1/${yearController.text}'
-            : null
-      };
+        final Map req = {
+          "DNo": Get.arguments.docNo,
+          "TrS": Get.arguments.trSerial,
+          "AccS": Get.arguments.accSerial,
+          "ItmS": item![0]['Serial'],
+          "Qnt": qnt,
+          "StCode": localeStorage.read('store') != null
+              ? int.parse(localeStorage.read('store'))
+              : 1,
+          "StCode2": Get.arguments.toStore != null ? Get.arguments.toStore : 0,
+          "InvNo": 0,
+          "ItmBarCode": codeController.text,
+          "DevNo": localeStorage.read('device') != null
+              ? int.parse(localeStorage.read('device'))
+              : 1,
+          "ExpDate": expD
+        };
 
-      var resp = await DocItemProvider().insertItem(req);
-      item = [];
-      qtyController.clear();
-      wholeQtyController.clear();
-      codeController.clear();
-      monthController.clear();
-      yearController.clear();
-      expDate = null;
-      withExp = false;
-      fetchItems();
-      _fieldFocusChange(context, qtyFocus, itemFocus);
+        var resp = await DocItemProvider().insertItem(req);
+        item = [];
+        qtyController.clear();
+        wholeQtyController.clear();
+        codeController.clear();
+        monthController.clear();
+        yearController.clear();
+        expDate = null;
+        withExp = false;
+        fetchItems();
+        _fieldFocusChange(context, qtyFocus, itemFocus);
+      }
     }
-    // print(Get.arguments);
+    print(Get.arguments);
 
 //
   }
